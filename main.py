@@ -40,7 +40,9 @@ def getTemperature(drone):
 
 #Simule le déplacement d'un drone dans la zone et à chaque mouvement le controle de la temperature
 def parcourirZone(drone, zone):
-    print("Positionnement du drone aux coordonnées : " + str(drone.latitude) + " x " + str(drone.longitude))
+    print("Positionnement du drone aux coordonnées : " + str(zone.latitude) + " x " + str(zone.longitude))
+    drone.latitude = zone.latitude
+    drone.longitude = zone.longitude
     print("Parcours de la zone jusqu'aux coordonnées : " + str(zone.latitude2) + " x " + str(zone.longitude2))
     feuTrouve = False
     while drone.latitude < zone.latitude2 and feuTrouve is False:
@@ -55,5 +57,5 @@ def parcourirZone(drone, zone):
 # Instanciation et envoi drones
 for i in range(1,int(nombreDrones)+1):
     d1 = Drone(i, "Drone"+str(i), 0, 0)
-    parcourirZone(d1, zone(i, "Zone"+str(i),))
+    parcourirZone(d1, Zone(i, "Secteur"+str(i), z1.latitude, z1.longitude + largeurSecteur * (i-1), z1.latitude2, z1.longitude + largeurSecteur * i))
 
