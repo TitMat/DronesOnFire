@@ -6,16 +6,21 @@ import random
 
 from drone import Drone
 from zone import Zone
+import turtle
+tur = turtle.Turtle()
 
 
 # Demande du nombre de drones à instancier
-nombreDrones = input("Combien de drone doivent être envoyés sur zone ?")
-
+# Demande de la longuer de la zone
+# Demande de la largeur de la zone
+nombreDrones = int(input("Combien de drone doivent être envoyés sur zone ?"))
+longueurZone = int(input("Quelle est la longueur de la zone ?"))
+largeurZone = int(input("Quelle est la largeur de la zone ?"))
 # Instanciation zone
-z1 = Zone(1, "Zone1", 0, 0, 10, 10)
+z1 = Zone(1, "Zone1", 0, 0, longueurZone, largeurZone)
 
 # Largeur d'un secteur
-largeurSecteur = z1.longitude2/int(nombreDrones)
+largeurSecteur = round(z1.longitude2/nombreDrones)
 
 # Affecte une temperature haute de manière aléatoire à un point de la zone
 def startFeuZone(zone):
@@ -40,22 +45,43 @@ def getTemperature(drone):
 
 #Simule le déplacement d'un drone dans la zone et à chaque mouvement le controle de la temperature
 def parcourirZone(drone, zone):
+
     print("Positionnement du drone aux coordonnées : " + str(zone.latitude) + " x " + str(zone.longitude))
     drone.latitude = zone.latitude
     drone.longitude = zone.longitude
+    if drone.id == 1:
+        tur.left(90)
+    tur.setposition(drone.latitude*10, drone.longitude*10)
+    tur.setpos(drone.latitude*10, drone.longitude*10)
     print("Parcours de la zone jusqu'aux coordonnées : " + str(zone.latitude2) + " x " + str(zone.longitude2))
     feuTrouve = False
+    tur.pendown()
     while drone.latitude < zone.latitude2 and feuTrouve is False:
-        while drone.longitude < zone.longitude2 and feuTrouve is False:
+        while drone.longitude < zone.longitude2 and drone.longitude >= zone.longitude and feuTrouve is False:
             if getTemperature(drone) > 50:
-                print("Feu suspecté à la position : " + str(drone.latitude) + " x " + str(drone.longitude))
+                print("*** Feu suspecté à la position : " + str(drone.latitude) + " x " + str(drone.longitude))
                 feuTrouve = True
-            drone.longitude = drone.longitude + 1
-        drone.latitude = drone.latitude + 1
-        drone.longitude = 0
+                tur.penup()
+            drone.longitude = drone.longitude + (-1)**(drone.deplacement)
+            tur.forward((-1)**(drone.deplacement)*10)
+        if (-1)**(drone.deplacement) == (1):
+            tur.right(90)
+            tur.forward(10)
+            drone.latitude = drone.latitude + 1
+            tur.left(90)
+        else:
+            tur.right(90)
+            tur.forward(10)
+            drone.latitude = drone.latitude + 1
+            tur.left(90)
+        drone.deplacement = drone.deplacement + 1
+        drone.longitude = drone.longitude + (-1)**(drone.deplacement)
+    tur.penup()
+    if (-1)**(drone.deplacement):
+        tur.left(180)
+
 
 # Instanciation et envoi drones
-for i in range(1,int(nombreDrones)+1):
-    d1 = Drone(i, "Drone"+str(i), 0, 0)
-    parcourirZone(d1, Zone(i, "Secteur"+str(i), z1.latitude, z1.longitude + largeurSecteur * (i-1), z1.latitude2, z1.longitude + largeurSecteur * i))
+for i in range(1, nombreDrones+1):
+    parcourirZone(Drone(i, "Drone"+str(i), 0, 0, 0), Zone(i, "Secteur"+str(i), z1.latitude, z1.longitude + largeurSecteur * (i-1), z1.latitude2, z1.longitude + largeurSecteur * i))
 
